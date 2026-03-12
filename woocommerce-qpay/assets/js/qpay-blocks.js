@@ -6,7 +6,10 @@ const { __ } = window.wp.i18n;
 const settings = getSetting( 'qpay_data', {} );
 
 const Content = () => {
-    return createElement( 'div', null, settings.description || __( 'Pay via QPay QR code.', 'woocommerce-qpay' ) );
+    return createElement( 'div', null, 
+        createElement( 'div', null, settings.description || __( 'Pay via QPay QR code.', 'woocommerce-qpay' ) ),
+        createElement( 'div', { style: { marginTop: '8px', fontSize: '13px', color: '#666', fontStyle: 'italic' } }, __( 'A secure QPay QR code will be generated on the next screen after you place your order.', 'woocommerce-qpay' ) )
+    );
 };
 
 const Icon = () => {
