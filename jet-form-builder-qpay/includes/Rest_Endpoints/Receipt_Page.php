@@ -3,6 +3,7 @@
 namespace Jet_FB_Qpay\Rest_Endpoints;
 
 use Jet_Form_Builder\Gateways\Db_Models\Payment_Model;
+use JFB_Modules\Gateways\Db_Models\Payment_Meta_Model;
 
 class Receipt_Page {
 
@@ -15,9 +16,21 @@ class Receipt_Page {
 	}
 
 	public function render_page( $request ) {
-		$id      = $request->get_param( 'id' );
-		$qr_image = get_post_meta( $id, '_qpay_qr_image', true );
-		$urls     = json_decode( get_post_meta( $id, '_qpay_urls', true ), true );
+		global $wpdb;
+		$id         = $request->get_param( 'id' );
+		$meta_table = Payment_Meta_Model::table();
+
+		$qr_image = $wpdb->get_var( $wpdb->prepare(
+			"SELECT meta_value FROM $meta_table WHERE payment_id = %d AND meta_key = '_qpay_qr_image'",
+			$id
+		) );
+
+		$urls_json = $wpdb->get_var( $wpdb->prepare(
+			"SELECT meta_value FROM $meta_table WHERE payment_id = %d AND meta_key = '_qpay_urls'",
+			$id
+		) );
+		
+		$urls = json_decode( $urls_json, true );
 
 		if ( ! $qr_image ) {
 			return new \WP_Error( 'no_qr', 'QR code not found for this payment.' );

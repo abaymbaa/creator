@@ -4,6 +4,7 @@ namespace Jet_FB_Qpay\Jet_Form_Builder\Logic;
 
 use Jet_FB_Qpay\Qpay_Api;
 use JFB_Modules\Gateways\Db_Models\Payment_Model;
+use JFB_Modules\Gateways\Db_Models\Payment_Meta_Model;
 use Jet_Form_Builder\Gateways\Scenarios_Abstract\Scenario_Logic_Base;
 use Jet_Form_Builder\Db_Queries\Exceptions\Sql_Exception;
 
@@ -38,7 +39,7 @@ class Pay_Now_Logic extends Scenario_Logic_Base {
 		}
 
 		$price = $controller->get_price_var();
-		$payment_id = $controller->get_order_id(); // This is the ID of the related action (e.g. Save Record)
+		$record_id = $controller->get_order_id(); // This is the ID of the related action (e.g. Save Record)
 
 		if ( ! $price ) {
 			// Fallback or error if price is not resolved
@@ -51,19 +52,20 @@ class Pay_Now_Logic extends Scenario_Logic_Base {
 			$controller->current_gateway( 'invoice_code' )
 		);
 
-		// Use the $payment_id as the sender_invoice_no for QPay
-		$qpay_payment_id = $this->save_preliminary_payment( $price, $payment_id );
+		// Use the $record_id as the sender_invoice_no for QPay invoice description,
+		// but use the ACTUAL payment ID for the transaction management.
+		$qpay_payment_id = $this->save_preliminary_payment( $price, $record_id );
 
-		$receipt_url = get_rest_url( null, 'jet-fb-qpay/v1/receipt/' . $payment_id );
+		$receipt_url = get_rest_url( null, 'jet-fb-qpay/v1/receipt/' . $qpay_payment_id );
 
-		$result = $api->create_invoice( $payment_id, $price, $receipt_url );
+		$result = $api->create_invoice( $qpay_payment_id, $price, $receipt_url );
 
 		if ( is_wp_error( $result ) ) {
 			wp_die( $result->get_error_message() );
 		}
 
 		// Update payment with invoice ID and QR info
-		$this->update_payment_with_invoice( $payment_id, $result );
+		$this->update_payment_with_invoice( $qpay_payment_id, $result );
 
 		jet_fb_action_handler()->add_response(
 			array( 'redirect' => $receipt_url )
@@ -98,10 +100,26 @@ class Pay_Now_Logic extends Scenario_Logic_Base {
 				array( 'id' => $id )
 			);
 			
-			// Store QR data in meta since there's no native column in payment model for this
-			update_post_meta( $id, '_qpay_qr_text', $invoice_data['qr_text'] );
-			update_post_meta( $id, '_qpay_qr_image', $invoice_data['qr_image'] ?? '' );
-			update_post_meta( $id, '_qpay_urls', json_encode( $invoice_data['urls'] ?? array() ) );
+			// Store QR data using Payment_Meta_Model
+			$meta_model = new Payment_Meta_Model();
+			
+			$meta_model->insert( array(
+				'payment_id' => $id,
+				'meta_key'   => '_qpay_qr_text',
+				'meta_value' => $invoice_data['qr_text'],
+			) );
+
+			$meta_model->insert( array(
+				'payment_id' => $id,
+				'meta_key'   => '_qpay_qr_image',
+				'meta_value' => $invoice_data['qr_image'] ?? '',
+			) );
+
+			$meta_model->insert( array(
+				'payment_id' => $id,
+				'meta_key'   => '_qpay_urls',
+				'meta_value' => wp_json_encode( $invoice_data['urls'] ?? array() ),
+			) );
 			
 		} catch ( Sql_Exception $exception ) {
 			// Fail silently or log

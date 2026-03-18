@@ -34,6 +34,8 @@ class Check_Status {
 
 		// Check with QPay API
 		$controller = new \Jet_FB_Qpay\Jet_Form_Builder\Controller();
+		$controller->set_form_gateways_meta();
+		
 		$api = new Qpay_Api(
 			$controller->current_gateway( 'username' ),
 			$controller->current_gateway( 'password' ),
@@ -68,9 +70,16 @@ class Check_Status {
 	}
 
 	protected function get_success_url( $payment ) {
-		// Try to find the referer URL from the form meta or just use home URL
-		// JetFormBuilder usually handles redirection after payment.
-		// For simplicity, redirect to home or a common success page if known.
+		$form_id = $payment['form_id'] ?? 0;
+		if ( $form_id ) {
+			// Try to get success redirect from form settings if possible
+			// For now, redirecting to the form page is a safe default
+			$refer = get_post_meta( $form_id, '_jet_fb_refer', true );
+			if ( $refer ) {
+				return $refer;
+			}
+		}
+
 		return get_home_url();
 	}
 }
