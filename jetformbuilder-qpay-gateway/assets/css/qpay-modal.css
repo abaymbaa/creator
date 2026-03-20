@@ -1,0 +1,126 @@
+/* JFB QPay Modal Styles */
+.jfb-qpay-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.jfb-qpay-modal-overlay.active {
+    opacity: 1;
+}
+
+.jfb-qpay-modal-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.jfb-qpay-modal-overlay.active .jfb-qpay-modal-card {
+    transform: translateY(0);
+}
+
+.jfb-qpay-modal-header h3 {
+    margin: 0 0 1rem;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.jfb-qpay-qr-container {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+}
+
+.jfb-qpay-qr-container svg, .jfb-qpay-qr-container img {
+    max-width: 200px;
+    height: auto;
+}
+
+.jfb-qpay-modal-info {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+.jfb-qpay-apps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+    margin-bottom: 1.5rem;
+}
+
+.jfb-qpay-app-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    padding: 8px;
+    border-radius: 10px;
+    background: #f0f2f5;
+    transition: background 0.2s;
+}
+
+.jfb-qpay-app-btn:hover {
+    background: #e4e6e9;
+}
+
+.jfb-qpay-app-btn img {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 5px;
+}
+
+.jfb-qpay-app-btn span {
+    font-size: 10px;
+    color: #333;
+}
+
+.jfb-qpay-polling-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-weight: 600;
+    color: #007bff;
+}
+
+.jfb-qpay-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ccc;
+    border-top-color: #007bff;
+    border-radius: 50%;
+    animation: jfb-qpay-spin 1s linear infinite;
+}
+
+@keyframes jfb-qpay-spin {
+    to { transform: rotate(360deg); }
+}
+
+.jfb-qpay-close-btn {
+    margin-top: 1rem;
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    font-size: 0.8rem;
+    text-decoration: underline;
+}
