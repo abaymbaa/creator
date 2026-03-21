@@ -50,6 +50,17 @@ class Controller extends Base_Gateway {
 				'type'  => 'text',
 				'help'  => __( 'Enter the name of the field containing the payment amount (e.g., calculated_field_name).', 'jetformbuilder-qpay-gateway' ),
 			),
+			'use_global' => array(
+				'label'    => __( 'Use Global Settings', 'jetformbuilder-qpay-gateway' ),
+				'type'     => 'checkbox',
+				'required' => false,
+			),
+		);
+	}
+
+	public function additional_editor_data(): array {
+		return array(
+			'version' => 1,
 		);
 	}
 
@@ -58,14 +69,21 @@ class Controller extends Base_Gateway {
 	}
 
 	public function action( $action_handler ) {
-		$client_id             = $this->current_gateway( 'client_id' );
-		$client_secret         = $this->current_gateway( 'client_secret' );
-		$invoice_code          = $this->current_gateway( 'invoice_code' );
-		$invoice_receiver_code = $this->current_gateway( 'invoice_receiver_code' );
-		$is_sandbox    = $this->current_gateway( 'is_sandbox' );
-		$price_field   = $this->current_gateway( 'price_field' );
+		$settings = $this->get_settings();
+
+		$client_id             = $settings['client_id'] ?? '';
+		$client_secret         = $settings['client_secret'] ?? '';
+		$invoice_code          = $settings['invoice_code'] ?? '';
+		$invoice_receiver_code = $settings['invoice_receiver_code'] ?? '';
+		$is_sandbox            = ! empty( $settings['is_sandbox'] );
+		$price_field           = $settings['price_field'] ?? '';
 
 		if ( ! $client_id || ! $client_secret ) {
+			if ( class_exists( '\Jet_Form_Builder\Dev_Log' ) ) {
+				\Jet_Form_Builder\Dev_Log::instance()->info( 'QPay: Missing credentials', array(
+					'form_id' => jet_fb_action_handler()->get_form_id(),
+				) );
+			}
 			throw new Gateway_Exception( __( 'QPay credentials are not configured.', 'jetformbuilder-qpay-gateway' ) );
 		}
 
@@ -117,5 +135,18 @@ class Controller extends Base_Gateway {
 			'urls'       => $response['urls'] ?? array(),
 			'amount'     => $amount,
 		);
+	}
+
+	protected function get_settings() {
+		$form_id = jet_fb_action_handler()->get_form_id();
+		$module  = \JFB_Modules\Gateways\Module::instance();
+		$form_gateways = $module->get_form_gateways_by_id( $form_id );
+		$qpay_settings = $form_gateways['qpay'] ?? array();
+
+		if ( empty( $qpay_settings['use_global'] ) && ! empty( $qpay_settings['client_id'] ) ) {
+			return $qpay_settings;
+		}
+
+		return array_merge( $qpay_settings, $module->get_global_settings( 'qpay' ) );
 	}
 }

@@ -81,7 +81,10 @@ final class WC_QPay_Blocks_Support extends AbstractPaymentMethodType {
      * @return array
      */
     public function get_supported_features() {
-        $gateway = new WC_Gateway_QPay();
-        return $gateway->supports;
+        $gateways = WC()->payment_gateways()->payment_gateways();
+        if ( isset( $gateways['qpay'] ) ) {
+            return $gateways['qpay']->supports;
+        }
+        return array( 'products' );
     }
 }

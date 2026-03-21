@@ -21,12 +21,15 @@ class Settings_Tab extends Base_Handler {
 		$invoice_receiver_code = sanitize_text_field( $_POST['invoice_receiver_code'] ?? '' );
 		$is_sandbox            = 'true' === sanitize_key( $_POST['is_sandbox'] ?? '' );
 
+		$price_field           = sanitize_text_field( $_POST['price_field'] ?? '' );
+
 		$result = $this->update_options( array(
 			'client_id'             => $client_id,
 			'client_secret'         => $client_secret,
 			'invoice_code'          => $invoice_code,
 			'invoice_receiver_code' => $invoice_receiver_code,
 			'is_sandbox'            => $is_sandbox,
+			'price_field'           => $price_field,
 		) );
 
 		$this->send_response( $result );
@@ -39,6 +42,7 @@ class Settings_Tab extends Base_Handler {
 			'invoice_code'          => '',
 			'invoice_receiver_code' => '',
 			'is_sandbox'            => false,
+			'price_field'           => '',
 		) );
 	}
 
@@ -59,6 +63,8 @@ class Settings_Tab extends Base_Handler {
 				'invoice_code'          => __( 'Invoice Code', 'jetformbuilder-qpay-gateway' ),
 				'invoice_receiver_code' => __( 'Terminal ID (Receiver Code)', 'jetformbuilder-qpay-gateway' ),
 				'is_sandbox'            => __( 'Sandbox Mode', 'jetformbuilder-qpay-gateway' ),
+				'price_field'           => __( 'Default Price Field Name', 'jetformbuilder-qpay-gateway' ),
+				'price_field_help'      => __( 'Default field name for payment amount (can be overridden in form settings).', 'jetformbuilder-qpay-gateway' ),
 			)
 		) );
 	}

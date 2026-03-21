@@ -74,6 +74,19 @@
                             expression: 'storage.invoice_receiver_code'
                         }
                     }),
+                    _c('cx-vui-input', {
+                        attrs: {
+                            label: jfbQpayAdmin.labels.price_field,
+                            'wrapper-css': ['equalwidth'],
+                            size: 'fullwidth',
+                            help: jfbQpayAdmin.labels.price_field_help
+                        },
+                        model: {
+                            value: this.storage.price_field,
+                            callback: (v) => { this.$set(this.storage, 'price_field', v) },
+                            expression: 'storage.price_field'
+                        }
+                    }),
                     _c('cx-vui-switcher', {
                         attrs: {
                             label: jfbQpayAdmin.labels.is_sandbox,
