@@ -1,0 +1,54 @@
+.profile-skills-mastery {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #f9f9fb;
+    border-radius: 12px;
+    border: 1px solid #e1e1e7;
+}
+
+.profile-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    color: #1a1a1a;
+}
+
+.skills-mastery-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.skill-mastery-item {
+    width: 100%;
+}
+
+.skill-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.skill-name {
+    font-weight: 500;
+    color: #333;
+}
+
+.skill-stats {
+    color: #666;
+}
+
+.skill-progress-bar {
+    height: 8px;
+    background: #e1e1e7;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.skill-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6366f1 0%, #a855f7 100%);
+    border-radius: 4px;
+    transition: width 0.6s ease-in-out;
+}
